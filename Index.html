@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAMRAJ // Cyber Terminal Portfolio</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-color: #ff2a2a;
+            --dim-color: #880000;
+            --green-color: #00ff66;
+            --gold-color: #ffcc00;
+            --font-family: 'Courier New', Courier, monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Scanline CRT Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 10;
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
+        }
+
+        .terminal {
+            width: 100%;
+            max-width: 900px;
+            height: 85vh;
+            background: #0a0000;
+            border: 2px solid var(--dim-color);
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.25);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .terminal-header {
+            background: #1a0000;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--dim-color);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .btn-close { background: #ff5f56; }
+        .btn-min { background: #ffbd2e; }
+        .btn-max { background: #27c93f; }
+
+        .title {
+            color: #ff8888;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .terminal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: var(--dim-color);
+        }
+
+        .banner {
+            color: var(--text-color);
+            font-weight: bold;
+            white-space: pre;
+            font-size: 11px;
+            line-height: 1.1;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px var(--text-color);
+        }
+
+        @media (max-width: 600px) {
+            .banner { font-size: 7px; }
+            .terminal-body { font-size: 13px; }
+        }
+
+        .prompt-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .prompt {
+            color: var(--green-color);
+            font-weight: bold;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-family: var(--font-family);
+            font-size: 15px;
+            width: 100%;
+            caret-color: var(--text-color);
+        }
+
+        .output {
+            margin-bottom: 8px;
+            color: #dddddd;
+            word-break: break-word;
+        }
+
+        .output-highlight {
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .cmd-list {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .cmd-name {
+            color: var(--green-color);
+        }
+
+        .deathnote-box {
+            border: 1px dashed var(--text-color);
+            padding: 10px;
+            margin-top: 5px;
+            background: rgba(255, 0, 0, 0.05);
+        }
+
+        a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="terminal">
+    <div class="terminal-header">
+        <div class="buttons">
+            <span class="btn btn-close"></span>
+            <span class="btn btn-min"></span>
+            <span class="btn btn-max"></span>
+        </div>
+        <div class="title">❖ Mʀ᭄YAMRAJ ࿐ // SYSTEM_OS v3.0</div>
+        <div></div>
+    </div>
+    
+    <div class="terminal-body" id="terminal-body">
+        <pre class="banner">
+██╗   ██╗ █████╗ ███╗   ███╗██████╗  █████╗  ██████╗ 
+╚██╗ ██╔╝██╔══██╗████╗ ████║██╔══██╗██╔══██╗  ╚════██╗
+ ╚████╔╝ ███████║██╔████╔██║██████╔╝███████║  █████╔╝
+  ╚██╔╝  ██╔══██║██║╚██╔╝██║██╔══██╗██╔══██║  ╚═══██╗
+   ██║   ██║  ██║██║ ╚═╝ ██║██║  ██║██║  ██║ ██████╔╝
+   ╚═╝   ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ 
+        </pre>
+        <div>SYSTEM INITIALIZATION COMPLETE...</div>
+        <div>Type <span class="output-highlight">'help'</span> to explore commands.</div>
+        <br>
+        
+        <div id="output-container"></div>
+
+        <div class="prompt-line">
+            <span class="prompt">yamraj@deathnet:~$</span>
+            <div class="input-container">
+                <input type="text" id="command-input" autofocus autocomplete="off" spellcheck="false">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('command-input');
+    const outputContainer = document.getElementById('output-container');
+    const terminalBody = document.getElementById('terminal-body');
+
+    // Local Storage for Death Note entries
+    let deathNoteList = JSON.parse(localStorage.getItem('yamraj_deathnote')) || [];
+
+    // Commands Registry
+    const commands = {
+        'help': `
+<div class="cmd-list">
+    <span class="cmd-name">about</span> <span>- Read Chitragupta's ledger about me</span>
+    <span class="cmd-name">skills</span> <span>- System tools and programming languages</span>
+    <span class="cmd-name">yamdoot</span> <span>- Access Bot Manager & Active Web Agents</span>
+    <span class="cmd-name">deathnote [name]</span> <span>- Write a name in Death Note ledger</span>
+    <span class="cmd-name">deathnote-list</span> <span>- View all logged target entries</span>
+    <span class="cmd-name">social</span> <span>- Direct communication channels</span>
+    <span class="cmd-name">clear</span> <span>- Clear terminal screen</span>
+</div>`,
+        'about': `
+<div>
+    <p class="output-highlight">[CHITRAGUPTA LEDGER - ENTRY #666]</p>
+    <p>Name: <strong>Yamraj / Dev</strong></p>
+    <p>Role: Full-Stack Developer | WhatsApp Bot Architect | Automation Engineer</p>
+    <p>Mission: Building high-performance bots, scripts, and dark cyber interfaces.</p>
+</div>`,
+        'skills': `
+<div>
+    <p class="output-highlight">[SYSTEM CAPABILITIES]</p>
+    <p>⚡ Languages: JavaScript, Node.js, Python, HTML5/CSS3, Bash Shell</p>
+    <p>🛠 Environment: Termux, Linux CLI, Git/GitHub, Baileys API</p>
+    <p>🤖 Specialty: Automated WhatsApp/Telegram Bots & Custom Web Scripts</p>
+</div>`,
+        'yamdoot': `
+<div>
+    <p class="output-highlight">[YAMDOOT BOT AGENTS STATUS]</p>
+    <br>
+    <p>💀 <strong>❖Mʀ᭄YAMRAJ࿐ WhatsApp Bot (Active)</strong></p>
+    <p>   • Architecture: Multi-Device Node.js Framework</p>
+    <p>   • Capabilities: Auto-Reply, Group Controls, Media Downloader, Termux Run</p>
+    <p>   • Status: <span style="color: var(--green-color);">ONLINE // EXECUTING COMMANDS</span></p>
+    <br>
+    <p>🔥 <strong>Cyber Yamdoot CLI (V2.0)</strong></p>
+    <p>   • Deployment: Termux Automated Script Suite</p>
+</div>`,
+        'social': `
+<div>
+    <p class="output-highlight">[COMMUNICATION CHANNELS]</p>
+    <p>Github   : <a href="https://github.com" target="_blank">github.com/yamraj</a></p>
+    <p>WhatsApp : <a href="#" target="_blank">Contact via Yamraj Bot</a></p>
+</div>`
+    };
+
+    // Command Input Handling
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const fullInput = input.value.trim();
+            input.value = '';
+
+            if (fullInput === '') return;
+
+            // Render Prompt Line
+            const historyLine = document.createElement('div');
+            historyLine.className = 'prompt-line';
+            historyLine.innerHTML = `<span class="prompt">yamraj@deathnet:~$</span> <span>${escapeHtml(fullInput)}</span>`;
+            outputContainer.appendChild(historyLine);
+
+            const parts = fullInput.split(' ');
+            const cmd = parts[0].toLowerCase();
+            const args = parts.slice(1).join(' ');
+
+            const responseContainer = document.createElement('div');
+            responseContainer.className = 'output';
+
+            // Feature Logic: Death Note & Yamdoot
+            if (cmd === 'clear') {
+                outputContainer.innerHTML = '';
+            } else if (cmd === 'deathnote') {
+                if (!args) {
+                    responseContainer.innerHTML = `<span style="color: #ffaa00;">Usage: deathnote [Name] (e.g., deathnote Bug_In_Code)</span>`;
+                } else {
+                    const targetName = escapeHtml(args);
+                    const timestamp = new Date().toLocaleTimeString();
+                    deathNoteList.push({ name: targetName, time: timestamp });
+                    localStorage.setItem('yamraj_deathnote', JSON.stringify(deathNoteList));
+
+                    responseContainer.innerHTML = `
+                    <div class="deathnote-box">
+                        <p style="color: #ff0000; font-weight: bold;">[DEATH NOTE RECORDED]</p>
+                        <p>Target: <span style="color: var(--gold-color);">${targetName}</span></p>
+                        <p>Time Written: ${timestamp}</p>
+                        <p style="color: #888;">Rule: Code/Target execution scheduled in 40 seconds...</p>
+                    </div>`;
+                }
+                outputContainer.appendChild(responseContainer);
+            } else if (cmd === 'deathnote-list') {
+                if (deathNoteList.length === 0) {
+                    responseContainer.innerHTML = `<div>The Death Note is currently empty. Use 'deathnote [Name]' to add entries.</div>`;
+                } else {
+                    let listHTML = `<p class="output-highlight">[DEATH NOTE RECORDED TARGETS]</p><br>`;
+                    deathNoteList.forEach((item, index) => {
+                        listHTML += `<p>${index + 1}. <span style="color: var(--gold-color);">${item.name}</span> <span style="color: #666;">(${item.time})</span></p>`;
+                    });
+                    responseContainer.innerHTML = listHTML;
+                }
+                outputContainer.appendChild(responseContainer);
+            } else if (commands[cmd]) {
+                responseContainer.innerHTML = commands[cmd];
+                outputContainer.appendChild(responseContainer);
+            } else {
+                responseContainer.innerHTML = `<span style="color: #ff4444;">Unknown command: '${escapeHtml(cmd)}'. Type 'help' for options.</span>`;
+                outputContainer.appendChild(responseContainer);
+            }
+
+            // Scroll to Bottom
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
+    });
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    document.addEventListener('click', () => input.focus());
+</script>
+
+</body>
+  </html>
+  
